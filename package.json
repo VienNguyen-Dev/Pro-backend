@@ -3,14 +3,22 @@
   "version": "1.0.0",
   "description": "js, backend, viennguyen",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "author": "viennguyen",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.4.4"
   }
 }
