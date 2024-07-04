@@ -153,7 +153,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const refreshAccessToken = asyncHandler(async (req, res) => {
   try {
     const isComingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    if (isComingRefreshToken) {
+    if (!isComingRefreshToken) {
       throw new ApiError(400, "Unauthorized request")
     }
     const decodedToken = jwt.verify(
