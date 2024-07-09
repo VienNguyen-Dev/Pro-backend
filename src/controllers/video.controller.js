@@ -150,7 +150,7 @@ const updateVideo = asyncHandler(async (req, res) => {
       description,
       thumbnail: thumbnail.url,
 
-      updatedAt: new Date(now())
+
     }
   },
     { new: true });
