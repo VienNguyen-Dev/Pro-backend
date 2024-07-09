@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 
-const tonggleSubscription = asyncHandler(async (req, res) => {
+const toggleSubscription = asyncHandler(async (req, res) => {
   const { chanelId } = req.params;
   const subscribberId = req.user._id;
   //Todo: toggle subscription
@@ -74,3 +74,5 @@ const getSubscribedChanel = asyncHandler(async (req, res) => {
       "Subscribed of user fetched successfully"
     ))
 })
+
+export { toggleSubscription, getSubscribedChanel, getUserChanelSubscriber }
