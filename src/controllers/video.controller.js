@@ -1,8 +1,9 @@
-import { Video } from "../models/video.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
-import { uploadOnCloudinary } from "../utils/cloudinary";
+import mongoose, { now } from "mongoose";
+import { Video } from "../models/video.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy = "createdAt", sortType = "asc", userId } = req.query;
@@ -72,8 +73,13 @@ const publishAVideo = asyncHandler(async (req, res) => {
   //upload video on cloundinary
   //create Video 
   const { title, description } = req.body;
-  const videoLocalPath = req.files?.videoFile?.path; //lay duong dan cua video file tu mang files 
-  const thumbnailLocalPath = req.files?.thumbnail?.path;
+
+  //check valid
+  if (!title && !description) {
+    throw new ApiError("Title or description is required")
+  }
+  const videoLocalPath = req.files?.videoFile[0]?.path; //lay duong dan cua video file tu mang files 
+  const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
   if (!videoLocalPath) {
     throw new ApiError(400, "Video file is required")
   }
@@ -86,8 +92,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 
   const video = await Video.create({
-    videoFile,
-    thumbnail,
+    videoFile: videoFile.url,
+    thumbnail: thumbnail.url,
     duration,
     title,
     description,
@@ -109,7 +115,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
 // search video 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  const video = await Video.findById({ _id: videoId });
+
+  const video = await Video.findById(videoId);
 
   if (!video) {
     throw new ApiError(404, "Video not found")
@@ -128,21 +135,22 @@ const getVideoById = asyncHandler(async (req, res) => {
 const updateVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { title, description } = req.body;
-  let thumbnailLocalPath;
-  if (req.files && Array.isArray(req.files?.thumbnail && req.files?.thumbnail?.length > 0)) {
-    thumbnailLocalPath = req.files?.thumbnail?.path;
-  }
-  if (!thumbnailLocalPath) {
-    throw new ApiError(400, "Thumbnail is required")
-  }
 
+
+  const thumbnailLocalPath = req.file?.path;
+
+
+  if (!thumbnailLocalPath) {
+    throw new ApiError(400, "Thumbnail file is missing")
+  }
   const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-  const video = await Video.findByIdAndUpdate({ _id: videoId }, {
+  const video = await Video.findByIdAndUpdate(videoId, {
     $set: {
       title,
       description,
-      thumbnail,
-      updatedAt: new Date.now()
+      thumbnail: thumbnail.url,
+
+      updatedAt: new Date(now())
     }
   },
     { new: true });
