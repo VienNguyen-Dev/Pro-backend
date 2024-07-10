@@ -1,4 +1,4 @@
-import mongoose, { now } from "mongoose";
+
 import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -89,7 +89,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
   const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
   const videoFile = await uploadOnCloudinary(videoLocalPath);
   const duration = videoFile.duration;
-
+  const owner = req.user?._id;
 
   const video = await Video.create({
     videoFile: videoFile.url,
@@ -98,7 +98,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     title,
     description,
     isPublished: true,
-    view: 0
+    view: 0,
+    owner
   })
   await video.save();
   return res

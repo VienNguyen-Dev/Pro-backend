@@ -10,9 +10,10 @@ const createTweet = asyncHandler(async (req, res) => {
   if (!content) {
     throw new ApiError(400, "Content is required")
   }
-
+  const owner = req.user?._id;
   const tweet = await Tweet.create({
-    content
+    content,
+    owner
   })
 
   await tweet.save();
